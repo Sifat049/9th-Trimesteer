@@ -1,0 +1,604 @@
+\documentclass[12pt,a4paper]{article}
+
+% Packages
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{float}
+
+\geometry{margin=1in}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+
+\begin{document}
+
+
+%================ FRONT PAGE =================
+
+\begin{titlepage}
+
+\begin{center}
+
+
+\includegraphics[width=0.25\textwidth]{uiu_logo.png}
+
+
+\vspace{0.5cm}
+
+
+{\Large \textbf{UNITED INTERNATIONAL UNIVERSITY}}\\[0.2cm]
+
+{\large Department of Computer Science and Engineering}
+
+
+\vspace{1cm}
+
+
+{\Large \textbf{Artificial Intelligence Laboratory}}\\[0.2cm]
+
+{\large Course No: CSE 3812}
+
+
+\vspace{1.5cm}
+
+
+{\Huge \textbf{Intelligent Sudoku Solver}}
+
+
+\vspace{0.5cm}
+
+
+{\Large Using CSP, AC-3, Backtracking and MRV}
+
+
+
+\vspace{2cm}
+
+
+
+% Student Information
+
+\begin{tabular}{>{\bfseries}l c l}
+
+Submitted By & : & MD. Mishkatul Bari Sifat \\[0.2cm]
+
+Student ID & : & 0112330669 \\[0.2cm]
+
+Section & : & H \\[0.2cm]
+
+Trimester & : & Summer 2026 (Online-2) \\
+
+\end{tabular}
+
+
+
+\vspace{2.5cm}
+
+
+
+% Faculty Information
+
+\begin{tabular}{>{\bfseries}l c l}
+
+Submitted To & : & Kazi Fahim Tahmid (KFT) \\[0.2cm]
+
+Designation & : & Lecturer \\[0.2cm]
+
+Email & : & fahimtahmid@cse.uiu.ac.bd \\
+
+\end{tabular}
+
+%
+%\textbf{Course:} 
+%& CSE 3812 Artificial Intelligence Laboratory \\
+
+%\textbf{Department:}
+%& Computer Science and Engineering
+
+%\end{tabular}
+
+
+
+\vfill
+
+
+United International University\\
+Dhaka, Bangladesh
+
+
+\vspace{0.5cm}
+
+
+%September 2026
+
+
+\end{center}
+
+\end{titlepage}
+
+
+%================ CONTENT =================
+
+
+\tableofcontents
+
+\newpage
+
+
+
+
+%---------------------------------------
+
+\section{Introduction}
+
+
+Sudoku is a classic constraint-based puzzle that can be modeled as a
+Constraint Satisfaction Problem (CSP).
+
+The objective of this project is to develop an Artificial Intelligence based
+Sudoku solver that efficiently solves Sudoku puzzles using intelligent search
+and constraint propagation techniques.
+
+Instead of using a naive brute-force approach, this project implements CSP
+representation, AC-3 (Arc Consistency-3), Backtracking Search, and Minimum
+Remaining Values (MRV) heuristic.
+
+The main goal is to reduce unnecessary search operations and improve solving
+efficiency.
+
+
+
+%---------------------------------------
+
+\section{Problem Representation as CSP}
+
+
+A Constraint Satisfaction Problem consists of three main components:
+
+\subsection{Variables}
+
+
+The Sudoku board contains 81 variables where each cell represents one
+variable.
+
+
+\[
+Total\ Variables = 9 \times 9 = 81
+\]
+
+
+\subsection{Domains}
+
+
+The domain represents possible values for each variable.
+
+For an empty cell:
+
+\[
+Domain = \{1,2,3,4,5,6,7,8,9\}
+\]
+
+
+For a pre-filled cell:
+
+\[
+Domain = \{Given\ Value\}
+\]
+
+
+
+\subsection{Constraints}
+
+
+Sudoku contains three main constraints:
+
+\begin{itemize}
+
+\item No duplicate number can exist in the same row.
+
+\item No duplicate number can exist in the same column.
+
+\item No duplicate number can exist inside the same 3x3 sub-grid.
+
+\end{itemize}
+
+
+
+%---------------------------------------
+
+\section{Input and Output Specification}
+
+
+The program reads Sudoku puzzles from:
+
+\begin{verbatim}
+puzzles.txt
+\end{verbatim}
+
+
+Each puzzle is represented as an 81-character string.
+
+The first 9 characters represent the first row, the next 9 characters
+represent the second row, and so on.
+
+
+The digit 0 represents an empty cell.
+
+
+After solving, the program generates:
+
+\begin{verbatim}
+solutions.txt
+\end{verbatim}
+
+
+The output file contains solved Sudoku boards represented as 81-character
+strings without zero values.
+
+
+
+%---------------------------------------
+
+\section{Algorithm Design}
+
+
+\subsection{AC-3 Algorithm}
+
+
+AC-3 (Arc Consistency-3) is used as a preprocessing algorithm before applying
+search.
+
+The purpose of AC-3 is to reduce variable domains by removing values that
+cannot satisfy Sudoku constraints.
+
+
+The algorithm checks every pair of connected variables called arcs:
+
+\[
+(X_i,X_j)
+\]
+
+
+If a value in one variable has no supporting value in another variable,
+that value is removed from the domain.
+
+
+\textbf{Advantages of AC-3:}
+
+\begin{itemize}
+
+\item Reduces search space.
+
+\item Removes invalid values early.
+
+\item Improves backtracking performance.
+
+\end{itemize}
+
+
+
+\subsection{Backtracking Search}
+
+
+After AC-3 preprocessing, recursive Backtracking Search is used to find the
+solution.
+
+
+The process:
+
+\begin{enumerate}
+
+\item Select an unassigned variable.
+
+\item Try a possible value.
+
+\item Check constraint satisfaction.
+
+\item Continue recursively.
+
+\item Backtrack if contradiction occurs.
+
+\end{enumerate}
+
+
+
+\subsection{Minimum Remaining Values (MRV) Heuristic}
+
+
+MRV is a variable selection heuristic.
+
+It selects the variable with the smallest remaining domain.
+
+
+Example:
+
+
+\[
+Cell A=\{1,2,3,4\}
+\]
+
+
+\[
+Cell B=\{7\}
+\]
+
+
+MRV selects Cell B first.
+
+
+\textbf{Benefits of MRV:}
+
+\begin{itemize}
+
+\item Reduces unnecessary branching.
+
+\item Detects failure earlier.
+
+\item Decreases node expansion.
+
+\end{itemize}
+
+
+
+%---------------------------------------
+
+\section{Object-Oriented Implementation}
+
+
+The solver was implemented using an object-oriented approach.
+
+
+The main class is:
+
+
+\begin{verbatim}
+SudokuCSP
+\end{verbatim}
+
+
+The class manages:
+
+
+\begin{itemize}
+
+\item Variables and domains
+
+\item Neighbor generation
+
+\item Constraint checking
+
+\item AC-3 execution
+
+\item Backtracking search
+
+\item Solution generation
+
+\end{itemize}
+
+
+This structure improves code organization and maintainability.
+
+
+
+%---------------------------------------
+
+\section{Experimental Results and Ablation Study}
+
+
+To evaluate the effect of the MRV heuristic, two experiments were performed:
+
+
+\begin{enumerate}
+
+\item MRV Enabled
+
+\item MRV Disabled
+
+\end{enumerate}
+
+
+
+%---------------------------------------
+
+\subsection{MRV Enabled Results}
+
+
+The solver was executed with MRV heuristic enabled.
+
+
+\begin{table}[H]
+
+\centering
+
+\begin{tabular}{ccc}
+
+\toprule
+
+Puzzle & Execution Time & Node Expansion \\
+
+\midrule
+
+Puzzle 1 & 0.00548 sec & 1 \\
+
+Puzzle 2 & 8.4245 sec & 6337 \\
+
+Puzzle 3 & 1.3556 sec & 950 \\
+
+\bottomrule
+
+\end{tabular}
+
+
+\caption{Performance with MRV Enabled}
+
+\end{table}
+
+
+
+
+
+%---------------------------------------
+
+\subsection{MRV Disabled Results}
+
+
+The solver was executed without MRV heuristic using sequential variable
+selection.
+
+
+\begin{table}[H]
+
+\centering
+
+\begin{tabular}{ccc}
+
+\toprule
+
+Puzzle & Execution Time & Node Expansion \\
+
+\midrule
+
+Puzzle 1 & 0.00640 sec & 1 \\
+
+Puzzle 2 & 553.1327 sec & 347581 \\
+
+Puzzle 3 & 0.2813 sec & 177 \\
+
+
+\bottomrule
+
+\end{tabular}
+
+
+\caption{Performance with MRV Disabled}
+
+\end{table}
+
+
+
+
+
+%---------------------------------------
+
+\section{Discussion}
+
+
+The experimental results demonstrate the effectiveness of the MRV heuristic.
+
+
+For the second puzzle:
+
+
+\begin{table}[H]
+
+\centering
+
+\begin{tabular}{ccc}
+
+\toprule
+
+Method & Time & Node Expansion \\
+
+\midrule
+
+MRV Enabled & 8.4245 sec & 6337 \\
+
+MRV Disabled & 553.1327 sec & 347581 \\
+
+
+\bottomrule
+
+\end{tabular}
+
+
+\caption{MRV Performance Comparison}
+
+\end{table}
+
+
+
+Without MRV, the solver explores many unnecessary branches because variables
+are selected sequentially.
+
+
+With MRV, the most constrained variable is selected first, which reduces the
+search space and improves efficiency.
+
+
+
+%---------------------------------------
+
+\section{Conclusion}
+
+
+An intelligent Sudoku solver was successfully developed using Artificial
+Intelligence techniques.
+
+
+The Sudoku puzzle was modeled as a Constraint Satisfaction Problem and solved
+using:
+
+
+\begin{itemize}
+
+\item CSP representation
+
+\item AC-3 constraint propagation
+
+\item Backtracking Search
+
+\item MRV heuristic
+
+\end{itemize}
+
+
+The experimental results show that MRV significantly improves performance by
+reducing unnecessary node expansion and execution time.
+
+
+
+%---------------------------------------
+
+\section{Future Improvements}
+
+
+Possible future improvements include:
+
+
+\begin{itemize}
+
+\item Degree heuristic implementation.
+
+\item Least Constraining Value ordering.
+
+\item Visualization of solving process.
+
+\item Support for larger Sudoku variants.
+
+\end{itemize}
+
+
+
+%---------------------------------------
+
+\section*{References}
+
+
+\begin{enumerate}
+
+
+
+\item Artificial Intelligence Laboratory Course Materials.
+
+
+\end{enumerate}
+
+
+\end{document}
